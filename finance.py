@@ -9,3 +9,11 @@ def addTransac(date, amount, type, category, note):
 # View all transaction
 def viewTransac():
     return transactions
+
+# Calculate total_credit
+def total_credit():
+    return sum(t.amount for t in transactions if t.type == "Credit")
+
+# Calculate total_debit
+def total_debit():
+    return sum(t.amount for t in transactions if t.type == "Debit")
