@@ -7,7 +7,7 @@ def add_transaction(date, amount, type, category, note):
     transactions.append(transac)
 
 # View all transaction
-def view_transaction():
+def view_transactions():
     return transactions
 
 # Calculate total_credit
