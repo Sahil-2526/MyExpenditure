@@ -1,3 +1,5 @@
+from category_type import CategoryType
+
 from finance import (
     add_transaction,
     view_transactions,
@@ -8,10 +10,10 @@ from finance import (
 )
 
 # Add sample data
-add_transaction("2026-06-30", 50000, "Credit", "Salary", "June salary")
-add_transaction("2026-06-30", 200, "Debit", "Food", "Lunch")
-add_transaction("2026-06-30", 1000, "Debit", "Shopping", "Amazon")
-add_transaction("2026-06-30", 500, "Debit", "Food", "Dinner")
+add_transaction("2026-06-30", 50000, CategoryType.CREDIT, "Salary", "June salary")
+add_transaction("2026-06-30", 200, CategoryType.DEBIT, "Food", "Lunch")
+add_transaction("2026-06-30", 1000, CategoryType.DEBIT, "Shopping", "Amazon")
+add_transaction("2026-06-30", 500, CategoryType.DEBIT, "Food", "Dinner")
 
 # View transactions
 print("\nALL TRANSACTIONS:")
