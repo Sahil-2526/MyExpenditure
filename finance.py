@@ -29,3 +29,20 @@ def category_wise_spending():
         if t.type == "Debit":
             summary[t.category] = summary.get(t.category, 0) + t.amount
     return summary
+
+# Get transaction by date
+def transaction_by_month(day, month, year):
+    summary = []
+    for t in transactions:
+        if t.date.day == day and t.date.month == month and t.date.year == year:
+            summary.append(t)
+    return summary
+
+
+# Get transaction by month
+def transaction_by_month(month, year):
+    summary = []
+    for t in transactions:
+        if t.date.month == month and t.date.year == year:
+            summary.append(t)
+    return summary
