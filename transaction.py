@@ -1,6 +1,9 @@
 from enums import TransactionType
 class Transaction:
+    next_id = 1
     def __init__ (self, date, amount, transaction_type: TransactionType, category, note):
+        self.id = Transaction.next_id
+        Transaction.next_id += 1
         self.date = date
         self.amount = amount
         self.transaction_type = transaction_type

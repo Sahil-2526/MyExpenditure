@@ -1,9 +1,4 @@
-from transaction import Transaction
-from category import Category
-from budget import Budget
-from goal import Goal
 from enums import TransactionType
-
 
 class FinanceManager:
     def __init__(self):
@@ -15,12 +10,18 @@ class FinanceManager:
     # ----------------------- Transaction Functions -------------------------------------------------------
     # Add transaction 
     def add_transaction(self,transaction):
-        transac = Transaction(transaction)
-        self.transactions.append(transac)
+        self.transactions.append(transaction)
 
     # View all transaction
-    def view_transactions(self):
+    def get_all_transactions(self):
         return self.transactions
+    
+    # Get single transaction 
+    def get_transaction(self, transaction_id):
+        for transaction in self.transactions:
+            if transaction.id == transaction_id:
+                return transaction
+        return None
     
     # Calculate total_credit
     def total_credit(self):
@@ -39,11 +40,11 @@ class FinanceManager:
         summary = {}
         for t in self.transactions:
             if t.transaction_type == TransactionType.DEBIT:
-                summary[t.category] = summary.get(t.category, 0) + t.amount
+                summary[t.category.name] = summary.get(t.category, 0) + t.amount
         return summary
     
     # Get transaction by date
-    def transaction_by_month(self, day, month, year):
+    def transaction_by_date(self, day, month, year):
         summary = []
         for t in self.transactions:
             if t.date.day == day and t.date.month == month and t.date.year == year:
@@ -77,9 +78,16 @@ class FinanceManager:
                 return
         print(f"Category '{category_name}' not found.")
     
-    # Get Categories
-    def get_categories(self):
+    # Get all categories
+    def get_all_categories(self):
         return self.categories
+    
+    # Get single transaction
+    def find_category(self, category_name):
+        for category in self.categories:
+            if category.name.lower() == category_name.lower():
+                return category
+        return None 
     
     # ------------------------------Budget Functions--------------------------------------------------------------
     # Add budget
@@ -174,11 +182,11 @@ class FinanceManager:
         print(f"Goal '{goal_name}' not found.")
 
     # Get all goals
-    def get_goals(self):
+    def get_all_goals(self):
         return self.goals
 
     # Get a single goal
-    def find_goal(self, goal_name):
+    def get_goal(self, goal_name):
         for goal in self.goals:
             if goal.name.lower() == goal_name.lower():
                 return goal
