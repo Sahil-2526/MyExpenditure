@@ -1,6 +1,6 @@
-from category_type import CategoryType
+from enums import CategoryType
 
-from finance import (
+from prev_fin_manager import (
     add_transaction,
     view_transactions,
     total_credit,

@@ -1,4 +1,4 @@
-from category_type import CategoryType
+from enums import CategoryType
 class Transaction:
     def __init__ (self, date, amount, category_type: CategoryType, category, note):
         self.date = date

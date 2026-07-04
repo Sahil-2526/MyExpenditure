@@ -1,4 +1,4 @@
-from category_type import CategoryType
+from enums import CategoryType
 
 class Category:
     def __init__(self, name, category_type: CategoryType, is_default=False):

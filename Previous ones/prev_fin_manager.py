@@ -1,5 +1,5 @@
-from model import Transaction
-from category_type import CategoryType
+from transaction import Transaction
+from enums import CategoryType
 transactions = []
 
 # Add transaction 

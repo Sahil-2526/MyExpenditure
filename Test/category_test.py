@@ -1,5 +1,5 @@
 from category import Category
-from category_type import CategoryType
+from enums import CategoryType
 
 food = Category("Food", CategoryType.DEBIT, True)
 salary = Category("Salary", CategoryType.CREDIT, True)
