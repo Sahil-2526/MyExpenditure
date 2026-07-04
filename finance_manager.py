@@ -59,3 +59,24 @@ class FinanceManager:
         return summary
     
     # ---------------------------Category Functions----------------------------------------------------------
+    # Add category
+    def add_category(self, category):
+        for prev_cat in self.categories:
+            if prev_cat.name.lower() == category.name.lower():
+                print(f"Category '{category.name}' already exist. ")
+                return
+        self.categories.append(category)
+        print(f"Category '{category.name}' added successfully. ")
+
+    # Remove category
+    def remove_category(self, category_name):
+        for category in self.categories:
+            if category.name.lower() == category_name.lower():
+                self.categories.remove(category)
+                print(f"Category '{category_name}' removed successfully.")
+                return
+        print(f"Category '{category_name}' not found.")
+    
+    # Get Categories
+    def get_categories(self):
+        return self.categories
