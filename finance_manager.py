@@ -82,6 +82,7 @@ class FinanceManager:
         return self.categories
     
     # ------------------------------Budget Functions--------------------------------------------------------------
+    # Add budget
     def add_budget(self, budget):
         for existing_budget in self.budgets:
             if (
@@ -97,6 +98,7 @@ class FinanceManager:
         self.budgets.append(budget)
         print(f"Budget added for {budget.category.name}.")
 
+    # Remove Budget
     def remove_budget(self, category_name, month, year):
         for budget in self.budgets:
             if (
@@ -109,9 +111,11 @@ class FinanceManager:
                 return
         print("Budget not found.")
 
+    # Get all budgets
     def get_all_budgets(self):
         return self.budgets
 
+    # Get budget by name and month of a year
     def get_budget(self, category_name, month, year):
         for budget in self.budgets:
             if (
@@ -122,6 +126,7 @@ class FinanceManager:
                 return budget
         return None
     
+    # Summarize a budget in detail 
     def check_budget(self, category_name, month, year):
         budget = self.get_budget(category_name, month, year)
         if budget is None:
@@ -147,3 +152,34 @@ class FinanceManager:
             print("Status    : Within Budget")
         else:
             print(f"Status    : Over Budget by ₹{-remaining}")
+
+
+    # -------------------------------------Goal functions--------------------------------------------------
+    # Add goal
+    def add_goal(self, goal):
+        for existing_goal in self.goals:
+            if existing_goal.name.lower() == goal.name.lower():
+                print(f"Goal '{goal.name}' already exists.")
+                return
+        self.goals.append(goal)
+        print(f"Goal '{goal.name}' added successfully.")
+
+    # Remove goal
+    def remove_goal(self, goal_name):
+        for goal in self.goals:
+            if goal.name.lower() == goal_name.lower():
+                self.goals.remove(goal)
+                print(f"Goal '{goal_name}' removed successfully.")
+                return
+        print(f"Goal '{goal_name}' not found.")
+
+    # Get all goals
+    def get_goals(self):
+        return self.goals
+
+    # Get a single goal
+    def find_goal(self, goal_name):
+        for goal in self.goals:
+            if goal.name.lower() == goal_name.lower():
+                return goal
+        return None
