@@ -1,5 +1,5 @@
 from enum import Enum
 
-class CategoryType(Enum):
+class TransactionType(Enum):
     CREDIT = "Credit"
     DEBIT = "Debit"

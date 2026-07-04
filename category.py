@@ -1,14 +1,14 @@
-from enums import CategoryType
+from enums import TransactionType
 
 class Category:
-    def __init__(self, name, category_type: CategoryType, is_default=False):
+    def __init__(self, name, transaction_type: TransactionType, is_default=False):
         self.name = name
-        self.category_type = category_type
+        self.transaction_type = transaction_type
         self.is_default = is_default
 
     def __repr__(self):
         return (
             f"{self.name} "
-            f"({self.category_type.value}) "
+            f"({self.transaction_type.value}) "
             f"- Default: {self.is_default}"
         )
