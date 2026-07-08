@@ -39,7 +39,7 @@ class Database:
         """)
     
         self.cursor.execute("""
-            CREATE TAVLE IF NOT EXISTS goals (
+            CREATE TABLE IF NOT EXISTS goals (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL UNIQUE,
                 target_amount REAL NOT NULL,
