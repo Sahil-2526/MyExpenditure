@@ -59,6 +59,24 @@ class FinanceManager:
                 summary.append(t)
         return summary
     
+    # Edit transaction 
+    def edit_transaction(self, transaction_id, amount = None, date = None, transaction_type = None, category = None, note = None ):
+        transaction = self.find_transaction(transaction_id)
+        if transaction is None:
+            print(f"Transaction with ID {transaction_id} not found.")
+            return
+        if amount is not None:
+            transaction.amount = amount
+        if date is not None:
+            transaction.date = date
+        if transaction_type is not None:
+            transaction.transaction_type = transaction_type
+        if category is not None:
+            transaction.category = category
+        if note is not None:
+            transaction.note = note
+        print(f"Transaction {transaction_id} updated successfully.")
+
     # ---------------------------Category Functions----------------------------------------------------------
     # Add category
     def add_category(self, category):
