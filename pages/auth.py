@@ -2,7 +2,7 @@ import streamlit as st
 from database import Database
 
 def render_auth():
-    st.title("🔐 Welcome to MyExpenditure")
+    st.title("💸 Welcome to MyExpenditure")
     st.markdown("Please log in or create an account to manage your personal finances securely.")
     
     tab_login, tab_register = st.tabs(["Login", "Sign Up"])
@@ -21,11 +21,11 @@ def render_auth():
                 if not username_input or not password_input:
                     st.error("Please fill in all fields.")
                 else:
-                    # Authenticate using backend login method
-                    uid = db.login_user(username_input, password_input)
+                    # Authenticate using backend login method (calls db.login)
+                    uid = db.login(username_input, password_input)
                     if uid:
                         st.session_state.uid = uid
-                        st.session_state.username = username_input
+                        db.username = username_input
                         st.success("Login successful! Redirecting...")
                         st.rerun()
                     else:
@@ -47,11 +47,14 @@ def render_auth():
                 elif reg_password != reg_confirm_password:
                     st.error("Passwords do not match.")
                 else:
-                    # Register user via backend (handles bcrypt hashing)
-                    new_uid = db.register_user(reg_username, reg_email, reg_password)
-                    if new_uid:
-                        st.success("Account created successfully! Please switch to the Login tab to sign in.")
-                    else:
-                        st.error("Username or email already exists. Try logging in.")
+                    # Register user via backend (calls db.register)
+                    try:
+                        new_uid = db.register(reg_username, reg_email, reg_password)
+                        if new_uid:
+                            st.success("Account created successfully! Please switch to the Login tab to sign in.")
+                        else:
+                            st.error("Username or email already exists. Try logging in.")
+                    except Exception as e:
+                        st.error(f"Registration failed: {e}")
 
     db.close()

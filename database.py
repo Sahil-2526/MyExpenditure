@@ -1,4 +1,6 @@
 import sqlite3
+import uuid
+import streamlit as st
 
 class Database:
     def __init__(self, db_name="myexpenditure.db"):
@@ -12,7 +14,7 @@ class Database:
     def create_tables(self):
 
         self.cursor.execute("""
-           CREATE TABLE users (
+            CREATE TABLE IF NOT EXISTS users (
                 uid INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
                 email TEXT UNIQUE NOT NULL,
@@ -78,16 +80,16 @@ class Database:
     def login(self, email, password):
         self.cursor.execute("""
             SELECT uid 
-            FROM user 
+            FROM users 
             WHERE email = ? AND
             password = ?
                 """,( email, password))
         user = self.cursor.fetchone()
-        return user[0]
+        return user
     
 #----------------- Category function ---------------
     def add_category(self, name, transaction_type, is_default):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             INSERT INTO categories
             (uid, name, transaction_type, is_default)
@@ -97,17 +99,17 @@ class Database:
         self.connection.commit()
 
     def get_categories(self):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             SELECT *
             FROM categories
             WHERE uid = ?
-        """, (uid))
+        """, (uid,))
 
         return self.cursor.fetchall()
 
     def find_category(self, name):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             SELECT *
             FROM categories
@@ -118,7 +120,7 @@ class Database:
         return self.cursor.fetchone()
 
     def remove_category(self, name):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             DELETE
             FROM categories
@@ -130,29 +132,30 @@ class Database:
 
 # --------------------- Transaction function 
 
-    def add_transaction(self, uid, amount, date, transaction_type, category_id, note):
-        uid = uid.session_state.uid
+    def add_transaction(self, amount, date, transaction_type, category_id, note):
+        uid = st.session_state.uid
         self.cursor.execute("""
             INSERT INTO transactions
             (uid, amount, date, transaction_type, category_id, note)
             VALUES (?, ?, ?, ?, ?, ?)
-        """, (amount, date, transaction_type, category_id, note))
+        """, (uid, amount, date, transaction_type, category_id, note))
 
         self.connection.commit()
         return self.cursor.lastrowid
 
-    def get_transactions(self, uid):
+    def get_transactions(self):
+        uid = st.session_state.uid
         self.cursor.execute("""
             SELECT *
             FROM transactions
             WHERE uid = ?
             ORDER BY date DESC 
-        """,(uid))
+        """,(uid,))
 
         return self.cursor.fetchall()
 
     def find_transaction(self, transaction_id):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             SELECT *
             FROM transactions
@@ -185,7 +188,7 @@ class Database:
         category_id = category_id if category_id is not None else transaction[4]
         note = note if note is not None else transaction[5]
 
-        uid = self.session_state.uid
+        uid = st.session_state.uid
 
         self.cursor.execute("""
             UPDATE transactions
@@ -210,7 +213,7 @@ class Database:
         self.connection.commit()
 
     def remove_transaction(self, transaction_id):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             DELETE
             FROM transactions
@@ -222,7 +225,7 @@ class Database:
 
     def get_transactions_by_month(self, month, year):
         month = f"{month:02d}"
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             SELECT *
             FROM transactions
@@ -236,7 +239,7 @@ class Database:
 
     def get_transactions_by_date(self, day, month, year):
         date = f"{year:04d}-{month:02d}-{day:02d}"
-        uid = self.session_state.uid
+        uid = st.session_state.uid
 
         self.cursor.execute("""
             SELECT *
@@ -250,7 +253,7 @@ class Database:
 #------------------------ Budget funcitons ----------
 
     def add_budget(self, category_id, limit_amount, month, year):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
 
         self.cursor.execute("""
             INSERT INTO budgets
@@ -261,20 +264,20 @@ class Database:
         self.connection.commit()
 
     def get_budgets(self):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
 
         self.cursor.execute("""
             SELECT *
             FROM budgets
             WHERE uid = ?
             ORDER BY year DESC, month DESC
-        """,(uid))
+        """,(uid,))
 
         return self.cursor.fetchall()
 
 
     def find_budget(self, category_id, month, year):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
 
         self.cursor.execute("""
             SELECT *
@@ -288,7 +291,7 @@ class Database:
         return self.cursor.fetchone()
 
     def update_budget(self, category_id, limit_amount, month, year):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
 
         self.cursor.execute("""
             UPDATE budgets
@@ -309,7 +312,7 @@ class Database:
 
 
     def remove_budget(self, category_id, month, year):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
 
         self.cursor.execute("""
             DELETE
@@ -330,7 +333,7 @@ class Database:
 # ------------------------- Goal functions --------
 
     def add_goal(self, name, target_amount, deadline):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
 
         self.cursor.execute("""
             INSERT INTO goals
@@ -341,19 +344,19 @@ class Database:
         self.connection.commit()
 
     def get_goals(self):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             SELECT *
             FROM goals
             WHERE uid = ?
             ORDER BY deadline
-        """,(uid))
+        """,(uid,))
     
         return self.cursor.fetchall()
 
 
     def find_goal(self, name):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             SELECT *
             FROM goals
@@ -364,7 +367,7 @@ class Database:
         return self.cursor.fetchone()
 
     def update_goal(self, name, target_amount, deadline):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             UPDATE goals
             SET
@@ -383,7 +386,7 @@ class Database:
 
 
     def remove_goal(self, name):
-        uid = self.session_state.uid
+        uid = st.session_state.uid
         self.cursor.execute("""
             DELETE
             FROM goals

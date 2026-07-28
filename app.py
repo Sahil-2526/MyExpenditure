@@ -17,7 +17,8 @@ def main():
     db.close()
 
     # Check if user is authenticated in session state
-    if "uid" not in st.session_state or st.session_state.uid is None:
+    if 'uid' not in st.session_state or st.session_state.uid == None:
+        st.session_state.uid = None
         render_auth()
         return
 
