@@ -65,7 +65,15 @@ class FinanceManager:
         return summary
     
     # Edit transaction 
-    def edit_transaction(self, transaction_id, amount = None, date = None, transaction_type = None, category_id = None, note = None ):
+    def edit_transaction(
+        self,
+        transaction_id,
+        amount=None,
+        date=None,
+        transaction_type=None,
+        category_id=None,
+        note=None
+    ):
         self.db.update_transaction(
             transaction_id,
             amount,

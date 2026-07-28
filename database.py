@@ -3,7 +3,11 @@ import sqlite3
 class Database:
     def __init__(self, db_name="myexpenditure.db"):
         self.connection = sqlite3.connect(db_name)
+        self.connection.execute("PRAGMA foreign_keys = ON")
         self.cursor = self.connection.cursor()
+
+    def close(self):
+        self.connection.close()
 
     def create_tables(self):
         self.cursor.execute("""
@@ -34,7 +38,8 @@ class Database:
                 limit_amount REAL NOT NULL,
                 month INTEGER NOT NULL,
                 year INTEGER NOT NULL,
-                FOREIGN KEY(category_id) REFERENCES categories(id)
+                FOREIGN KEY(category_id) REFERENCES categories(id),
+                UNIQUE(category_id, month, year)
             )
         """)
     
@@ -96,6 +101,7 @@ class Database:
         """, (amount, date, transaction_type, category_id, note))
 
         self.connection.commit()
+        return self.cursor.lastrowid
 
     def get_transactions(self):
         self.cursor.execute("""
@@ -116,7 +122,28 @@ class Database:
         return self.cursor.fetchone()
 
 
-    def update_transaction(self, transaction_id, amount, date, transaction_type, category_id, note ):
+    def update_transaction(
+       self,
+        transaction_id,
+        amount=None,
+        date=None,
+        transaction_type=None,
+        category_id=None,
+        note=None
+    ):
+        transaction = self.find_transaction(transaction_id)
+
+        if transaction is None:
+            return
+
+        amount = amount if amount is not None else transaction[1]
+        date = date if date is not None else transaction[2]
+        transaction_type = (
+            transaction_type if transaction_type is not None else transaction[3]
+        )
+        category_id = category_id if category_id is not None else transaction[4]
+        note = note if note is not None else transaction[5]
+
         self.cursor.execute("""
             UPDATE transactions
             SET
