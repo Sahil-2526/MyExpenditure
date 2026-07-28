@@ -1,0 +1,2 @@
+delete button of transaction
+transaction debit -> saving

@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from database import Database
 from finance_manager import FinanceManager
+from category import Category
 from enums import TransactionType
 
 st.set_page_config(page_title="Categories - MyExpenditure", page_icon="📁", layout="wide")
@@ -20,7 +21,8 @@ def render_categories():
         st.error(f"Error loading categories: {e}")
         categories = []
 
-    df_cat = pd.DataFrame(categories, columns=['id', 'name', 'transaction_type', 'is_default']) if categories else pd.DataFrame(columns=['id', 'name', 'transaction_type', 'is_default'])
+    # DB schema: id, uid, name, transaction_type, is_default
+    df_cat = pd.DataFrame(categories, columns=['id', 'uid', 'name', 'transaction_type', 'is_default']) if categories else pd.DataFrame(columns=['id', 'uid', 'name', 'transaction_type', 'is_default'])
 
     col1, col2 = st.columns(2)
 
@@ -41,13 +43,12 @@ def render_categories():
                         st.error("Category already exists! Duplicate categories are prevented.")
                     else:
                         try:
-                            class TempCategory:
-                                def __init__(self, name, t_type, is_def):
-                                    self.name = name
-                                    self.transaction_type = t_type
-                                    self.is_default = is_def
-
-                            new_cat = TempCategory(cat_name, cat_type, is_default)
+                            new_cat = Category(
+                                uid=st.session_state.uid,
+                                name=cat_name,
+                                transaction_type=cat_type,
+                                is_default=is_default
+                            )
                             manager.add_category(new_cat)
                             st.success(f"Category '{cat_name}' added successfully!")
                             st.rerun()
@@ -71,7 +72,7 @@ def render_categories():
     st.markdown("---")
     st.subheader("Existing Categories")
     if not df_cat.empty:
-        st.dataframe(df_cat, use_container_width=True)
+        st.dataframe(df_cat[['id', 'name', 'transaction_type', 'is_default']], use_container_width=True)
     else:
         st.info("No categories found.")
 

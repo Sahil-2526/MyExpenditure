@@ -1,9 +1,7 @@
 from enums import TransactionType
+
 class Transaction:
-    next_id = 1
-    def __init__ (self, uid, date, amount, transaction_type: TransactionType, category, note):
-        self.id = Transaction.next_id
-        Transaction.next_id += 1
+    def __init__(self, uid, date, amount, transaction_type: TransactionType, category, note):
         self.uid = uid
         self.date = date
         self.amount = amount
@@ -11,6 +9,5 @@ class Transaction:
         self.category = category
         self.note = note
 
-    def __repr__ (self):
-        return f"[ {self.date} | {self.amount} | {self.transaction_type} | {self.category} | {self.note} ]"
-    # used to represent how the data of the object will actually look if we use " print(object) "
+    def __repr__(self):
+        return f"[ {self.date} | ₹{self.amount} | {self.transaction_type.value} | {self.category} | {self.note} ]"

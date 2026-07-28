@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 from database import Database
 from finance_manager import FinanceManager
 from enums import TransactionType
@@ -22,12 +21,10 @@ def render_dashboard():
         budgets = manager.get_all_budgets()
         goals = manager.get_all_goals()
         
-        # Calculate totals from tuples: index 1 is amount, index 3 is transaction_type, index 4 is category_id
         total_income = sum(t[1] for t in transactions if t[3] == TransactionType.CREDIT.value)
         total_expense = sum(t[1] for t in transactions if t[3] == TransactionType.DEBIT.value)
         current_balance = total_income - total_expense
         
-        # Calculate category wise spending from tuples
         cat_spending = {}
         for t in transactions:
             if t[3] == TransactionType.DEBIT.value:
@@ -71,26 +68,25 @@ def render_dashboard():
 
     st.markdown("---")
 
-    # Additional Quick Stats & Insights
     c1, c2, c3 = st.columns(3)
     top_spending_category = max(cat_spending, key=cat_spending.get) if cat_spending else "N/A"
 
     with c1:
         st.info(f"**Total Transactions Recorded:** {num_transactions}")
     with c2:
-        st.success(f"**Account Health:** Stable")
+        st.success("**Account Health:** Stable")
     with c3:
         st.warning(f"**Top Spending Category:** {top_spending_category}")
 
     st.markdown("---")
 
-    # Recent Transactions & Budget Overview
     col_tab1, col_tab2 = st.columns(2)
     
     with col_tab1:
         st.subheader("Recent Transactions")
         if transactions:
-            st.dataframe(pd.DataFrame(transactions[:5], columns=['ID', 'Amount', 'Date', 'Type', 'Category ID', 'Note']), use_container_width=True)
+            df_recent = pd.DataFrame(transactions[:5], columns=['ID', 'UID', 'Amount', 'Date', 'Type', 'Category ID', 'Note'])
+            st.dataframe(df_recent[['ID', 'Date', 'Amount', 'Type', 'Category ID', 'Note']], use_container_width=True)
         else:
             st.info("No recent transactions found.")
 
@@ -98,7 +94,7 @@ def render_dashboard():
         st.subheader("Active Budgets Overview")
         if budgets:
             for b in budgets:
-                st.text(f"Budget ID {b[0]} | Limit: ₹{b[2]} | Month/Year: {b[3]}/{b[4]}")
+                st.text(f"Budget ID {b[0]} | Limit: ₹{b[3]} | Month/Year: {b[4]}/{b[5]}")
         else:
             st.info("No active budgets configured.")
 

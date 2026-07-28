@@ -1,10 +1,11 @@
 class Budget:
-    def __init__(self, uid, category, limit_count, month, year):
+    def __init__(self, uid, category, limit_amount, month, year):
         self.uid = uid
         self.category = category
-        self.limit_count = limit_count
+        self.limit_amount = limit_amount
         self.month = month
         self.year = year
+        
     def __repr__(self):
         return (
             f"{self.category.name} | "

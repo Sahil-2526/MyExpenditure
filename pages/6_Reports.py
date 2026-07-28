@@ -20,16 +20,16 @@ def render_reports():
         categories = manager.get_all_categories()
         cat_map = {c[0]: c[1] for c in categories}
         
-        # Calculate totals safely from tuples
-        total_income = sum(t[1] for t in transactions if t[3] == TransactionType.CREDIT.value)
-        total_expense = sum(t[1] for t in transactions if t[3] == TransactionType.DEBIT.value)
+        # Tuple indices: index 2 is amount, index 4 is transaction_type
+        total_income = sum(t[2] for t in transactions if t[4] == TransactionType.CREDIT.value)
+        total_expense = sum(t[2] for t in transactions if t[4] == TransactionType.DEBIT.value)
         total_savings = total_income - total_expense
         
         cat_spending = {}
         for t in transactions:
-            if t[3] == TransactionType.DEBIT.value:
-                cat_name = cat_map.get(t[4], "Uncategorized")
-                cat_spending[cat_name] = cat_spending.get(cat_name, 0.0) + t[1]
+            if t[4] == TransactionType.DEBIT.value:
+                cat_name = cat_map.get(t[5], "Uncategorized") # index 5 is category_id
+                cat_spending[cat_name] = cat_spending.get(cat_name, 0.0) + t[2]
                 
     except Exception as e:
         st.error(f"Error loading reports data: {e}")
@@ -43,7 +43,7 @@ def render_reports():
         st.info("No transaction data available to generate reports.")
         return
 
-    df = pd.DataFrame(transactions, columns=['id', 'amount', 'date', 'transaction_type', 'category_id', 'note'])
+    df = pd.DataFrame(transactions, columns=['id', 'uid', 'amount', 'date', 'transaction_type', 'category_id', 'note'])
 
     st.subheader("Financial Summary Metrics")
     c1, c2, c3 = st.columns(3)
@@ -53,7 +53,6 @@ def render_reports():
 
     st.markdown("---")
 
-    # Analytics Visualizations
     st.subheader("Visual Analytics")
     col_r1, col_r2 = st.columns(2)
 
@@ -76,7 +75,6 @@ def render_reports():
 
     st.markdown("---")
 
-    # CSV Download Section
     st.subheader("Download Reports")
     csv_report = df.to_csv(index=False).encode('utf-8')
     st.download_button(

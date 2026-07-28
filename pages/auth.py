@@ -1,3 +1,4 @@
+import sqlite3
 import streamlit as st
 from database import Database
 
@@ -13,7 +14,7 @@ def render_auth():
     with tab_login:
         st.subheader("Login to Your Account")
         with st.form("login_form"):
-            username_input = st.text_input("Username or Email")
+            username_input = st.text_input("Email")
             password_input = st.text_input("Password", type="password")
             login_submitted = st.form_submit_button("Login")
 
@@ -21,15 +22,14 @@ def render_auth():
                 if not username_input or not password_input:
                     st.error("Please fill in all fields.")
                 else:
-                    # Authenticate using backend login method (calls db.login)
-                    uid = db.login(username_input, password_input)
-                    if uid:
-                        st.session_state.uid = uid
-                        db.username = username_input
+                    user_record = db.login(username_input, password_input)
+                    if user_record:
+                        st.session_state.uid = user_record[0]
+                        st.session_state.username = username_input 
                         st.success("Login successful! Redirecting...")
                         st.rerun()
                     else:
-                        st.error("Invalid username/email or password.")
+                        st.error("Invalid email or password.")
 
     # --- SIGN UP / REGISTER TAB ---
     with tab_register:
@@ -47,13 +47,11 @@ def render_auth():
                 elif reg_password != reg_confirm_password:
                     st.error("Passwords do not match.")
                 else:
-                    # Register user via backend (calls db.register)
                     try:
-                        new_uid = db.register(reg_username, reg_email, reg_password)
-                        if new_uid:
-                            st.success("Account created successfully! Please switch to the Login tab to sign in.")
-                        else:
-                            st.error("Username or email already exists. Try logging in.")
+                        db.register(reg_username, reg_email, reg_password)
+                        st.success("Account created successfully! Please switch to the Login tab to sign in.")
+                    except sqlite3.IntegrityError:
+                        st.error("Username or email already exists. Try logging in.")
                     except Exception as e:
                         st.error(f"Registration failed: {e}")
 

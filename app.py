@@ -36,7 +36,7 @@ def main():
     with st.sidebar:
         st.markdown("## 💰 MyExpenditure")
         if "username" in st.session_state:
-            st.caption(f"Logged in as: **{st.session_state.username}** (UID: {st.session_state.uid})")
+            st.caption(f"Logged in as: **{st.session_state.username}**")
         st.markdown("---")
 
     # Navigation menu
@@ -56,12 +56,6 @@ def main():
             st.session_state.uid = None
             st.session_state.username = None
             st.rerun()
-
-        st.markdown("#### 🗄️ Database Status")
-        st.success("Connected to SQLite Database")
-        st.markdown("---")
-        st.markdown("#### 🎨 Theme Information")
-        st.info("Active Theme: Dark / Shadow & Silk")
 
     # Run selected page
     pg.run()

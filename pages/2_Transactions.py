@@ -19,17 +19,19 @@ def render_transactions():
     try:
         transactions = manager.get_all_transactions()
         categories = manager.get_all_categories()
-        cat_map = {c[0]: c[1] for c in categories} # id -> name mapping
+        cat_map = {c[0]: c[2] for c in categories}
+
+    
         
-        # Calculate totals safely from raw database tuples
-        total_credit = sum(t[1] for t in transactions if t[3] == TransactionType.CREDIT.value)
-        total_debit = sum(t[1] for t in transactions if t[3] == TransactionType.DEBIT.value)
+        total_credit = sum(t[2] for t in transactions if t[4] == TransactionType.CREDIT.value)
+        total_debit = sum(t[2] for t in transactions if t[4] == TransactionType.DEBIT.value)
     except Exception as e:
         st.error(f"Error fetching backend data: {e}")
         transactions, categories, cat_map = [], [], {}
         total_credit, total_debit = 0.0, 0.0
 
-    df = pd.DataFrame(transactions, columns=['id', 'amount', 'date', 'transaction_type', 'category_id', 'note']) if transactions else pd.DataFrame(columns=['id', 'amount', 'date', 'transaction_type', 'category_id', 'note'])
+    # DB schema columns: id, uid, amount, date, transaction_type, category_id, note
+    df = pd.DataFrame(transactions, columns=['id', 'uid', 'amount', 'date', 'transaction_type', 'category_id', 'note']) if transactions else pd.DataFrame(columns=['id', 'uid', 'amount', 'date', 'transaction_type', 'category_id', 'note'])
 
     tab1, tab2, tab3 = st.tabs(["View & Filter Transactions", "Add Transaction", "Manage / Delete"])
 
@@ -52,7 +54,8 @@ def render_transactions():
             t_amount = st.number_input("Amount (₹)", min_value=0.01, step=1.0)
             t_type = st.selectbox("Transaction Type", [TransactionType.CREDIT, TransactionType.DEBIT], format_func=lambda x: x.value)
             
-            cat_options = {c[1]: c[0] for c in categories}
+            cat_options = {c[2] : c[0] for c in categories}
+            
             selected_cat_name = st.selectbox("Category", list(cat_options.keys()) if cat_options else ["None"])
             t_note = st.text_area("Note / Description")
             
@@ -69,6 +72,7 @@ def render_transactions():
                                 self.name = cname
                         
                         tx_obj = Transaction(
+                            uid=st.session_state.uid,
                             date=t_date,
                             amount=t_amount,
                             transaction_type=t_type,

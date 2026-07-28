@@ -1,5 +1,4 @@
 import sqlite3
-import uuid
 import streamlit as st
 
 class Database:
@@ -12,7 +11,6 @@ class Database:
         self.connection.close()
 
     def create_tables(self):
-
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 uid INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,11 +81,11 @@ class Database:
             FROM users 
             WHERE email = ? AND
             password = ?
-                """,( email, password))
+                """,(email, password))
         user = self.cursor.fetchone()
         return user
     
-#----------------- Category function ---------------
+    # ----------------- Category functions ---------------
     def add_category(self, name, transaction_type, is_default):
         uid = st.session_state.uid
         self.cursor.execute("""
@@ -115,7 +113,7 @@ class Database:
             FROM categories
             WHERE LOWER(name)=LOWER(?) AND
             uid = ?
-        """, (name,uid))
+        """, (name, uid))
 
         return self.cursor.fetchone()
 
@@ -126,11 +124,11 @@ class Database:
             FROM categories
             WHERE LOWER(name)=LOWER(?) AND
             uid = ?
-        """, (name,uid))
+        """, (name, uid))
 
         self.connection.commit()
 
-# --------------------- Transaction function 
+    # --------------------- Transaction functions ---------------------
 
     def add_transaction(self, amount, date, transaction_type, category_id, note):
         uid = st.session_state.uid
@@ -165,9 +163,8 @@ class Database:
 
         return self.cursor.fetchone()
 
-
     def update_transaction(
-       self,
+        self,
         transaction_id,
         amount=None,
         date=None,
@@ -180,13 +177,13 @@ class Database:
         if transaction is None:
             return
 
-        amount = amount if amount is not None else transaction[1]
-        date = date if date is not None else transaction[2]
+        amount = amount if amount is not None else transaction[2]
+        date = date if date is not None else transaction[3]
         transaction_type = (
-            transaction_type if transaction_type is not None else transaction[3]
+            transaction_type if transaction_type is not None else transaction[4]
         )
-        category_id = category_id if category_id is not None else transaction[4]
-        note = note if note is not None else transaction[5]
+        category_id = category_id if category_id is not None else transaction[5]
+        note = note if note is not None else transaction[6]
 
         uid = st.session_state.uid
 
@@ -201,13 +198,13 @@ class Database:
             WHERE id = ? AND
                 uid = ?
         """, (
-            uid,
             amount,
             date,
             transaction_type,
             category_id,
             note,
-            transaction_id
+            transaction_id,
+            uid
         ))
 
         self.connection.commit()
@@ -219,12 +216,12 @@ class Database:
             FROM transactions
             WHERE id = ? AND
             uid = ?
-        """, (transaction_id,uid))
+        """, (transaction_id, uid))
 
         self.connection.commit()
 
     def get_transactions_by_month(self, month, year):
-        month = f"{month:02d}"
+        month_str = f"{month:02d}"
         uid = st.session_state.uid
         self.cursor.execute("""
             SELECT *
@@ -233,12 +230,12 @@ class Database:
             AND strftime('%Y', date) = ?
             AND uid = ?
             ORDER BY date
-        """, (month, str(year), uid))
+        """, (month_str, str(year), uid))
 
         return self.cursor.fetchall()
 
     def get_transactions_by_date(self, day, month, year):
-        date = f"{year:04d}-{month:02d}-{day:02d}"
+        date_str = f"{year:04d}-{month:02d}-{day:02d}"
         uid = st.session_state.uid
 
         self.cursor.execute("""
@@ -246,11 +243,11 @@ class Database:
             FROM transactions
             WHERE date = ? 
             AND uid = ?
-        """, (date, uid))
+        """, (date_str, uid))
     
         return self.cursor.fetchall()
 
-#------------------------ Budget funcitons ----------
+    # ------------------------ Budget functions ------------------------
 
     def add_budget(self, category_id, limit_amount, month, year):
         uid = st.session_state.uid
@@ -274,7 +271,6 @@ class Database:
         """,(uid,))
 
         return self.cursor.fetchall()
-
 
     def find_budget(self, category_id, month, year):
         uid = st.session_state.uid
@@ -310,7 +306,6 @@ class Database:
 
         self.connection.commit()
 
-
     def remove_budget(self, category_id, month, year):
         uid = st.session_state.uid
 
@@ -330,7 +325,7 @@ class Database:
 
         self.connection.commit()
 
-# ------------------------- Goal functions --------
+    # ------------------------- Goal functions -------------------------
 
     def add_goal(self, name, target_amount, deadline):
         uid = st.session_state.uid
@@ -354,7 +349,6 @@ class Database:
     
         return self.cursor.fetchall()
 
-
     def find_goal(self, name):
         uid = st.session_state.uid
         self.cursor.execute("""
@@ -362,7 +356,7 @@ class Database:
             FROM goals
             WHERE LOWER(name) = LOWER(?)
             AND uid = ?
-        """, (name,uid))
+        """, (name, uid))
 
         return self.cursor.fetchone()
 
@@ -384,7 +378,6 @@ class Database:
 
         self.connection.commit()
 
-
     def remove_goal(self, name):
         uid = st.session_state.uid
         self.cursor.execute("""
@@ -392,6 +385,6 @@ class Database:
             FROM goals
             WHERE LOWER(name) = LOWER(?)
             AND uid = ?
-        """, (name,uid))
+        """, (name, uid))
 
         self.connection.commit()

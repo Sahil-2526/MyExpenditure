@@ -20,7 +20,8 @@ def render_goals():
         st.error(f"Error loading goals: {e}")
         goals = []
 
-    df_goals = pd.DataFrame(goals, columns=['id', 'name', 'target_amount', 'deadline']) if goals else pd.DataFrame(columns=['id', 'name', 'target_amount', 'deadline'])
+    # DB schema: id, uid, name, target_amount, deadline
+    df_goals = pd.DataFrame(goals, columns=['id', 'uid', 'name', 'target_amount', 'deadline']) if goals else pd.DataFrame(columns=['id', 'uid', 'name', 'target_amount', 'deadline'])
 
     col1, col2 = st.columns(2)
 
@@ -37,7 +38,12 @@ def render_goals():
                     st.error("Goal name cannot be empty.")
                 else:
                     try:
-                        new_goal = Goal(name=g_name, target_amount=g_target, deadline=str(g_deadline))
+                        new_goal = Goal(
+                            uid=st.session_state.uid,
+                            name=g_name,
+                            target_amount=g_target,
+                            deadline=str(g_deadline)
+                        )
                         manager.add_goal(new_goal)
                         st.success(f"Goal '{g_name}' saved successfully!")
                         st.rerun()
@@ -61,7 +67,7 @@ def render_goals():
     st.markdown("---")
     st.subheader("Configured Goals")
     if not df_goals.empty:
-        st.dataframe(df_goals, use_container_width=True)
+        st.dataframe(df_goals[['id', 'name', 'target_amount', 'deadline']], use_container_width=True)
     else:
         st.info("No financial goals configured yet.")
 
