@@ -1,5 +1,6 @@
 class Budget:
-    def __init__(self, category, limit_count, month, year):
+    def __init__(self, uid, category, limit_count, month, year):
+        self.uid = uid
         self.category = category
         self.limit_count = limit_count
         self.month = month
