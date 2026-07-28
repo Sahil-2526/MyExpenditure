@@ -48,3 +48,38 @@ class Database:
         """)
                 
         self.connection.commit()
+
+    def add_category(self, name, transaction_type, is_default):
+        self.cursor.execute("""
+            INSERT INTO categories
+            (name, transaction_type, is_default)
+            VALUES (?, ?, ?)
+        """, (name, transaction_type, int(is_default)))
+
+        self.connection.commit()
+
+    def get_categories(self):
+        self.cursor.execute("""
+            SELECT *
+            FROM categories
+        """)
+
+        return self.cursor.fetchall()
+
+    def find_category(self, name):
+        self.cursor.execute("""
+            SELECT *
+            FROM categories
+            WHERE LOWER(name)=LOWER(?)
+        """, (name,))
+
+        return self.cursor.fetchone()
+
+    def remove_category(self, name):
+        self.cursor.execute("""
+            DELETE
+            FROM categories
+            WHERE LOWER(name)=LOWER(?)
+        """, (name,))
+
+        self.connection.commit()
