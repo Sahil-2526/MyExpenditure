@@ -1,6 +1,6 @@
 import streamlit as st
 from database import Database
-from auth import render_auth
+from pages.auth import render_auth
 
 # Page Configuration
 st.set_page_config(
