@@ -1,5 +1,6 @@
 import streamlit as st
 from database import Database
+from auth import render_auth
 
 # Page Configuration
 st.set_page_config(
@@ -11,16 +12,18 @@ st.set_page_config(
 
 def main():
     # Initialize database tables on startup
-    # Sidebar Header & Navigation Menu
-    with st.sidebar:
-        st.title("MyExpenditure")
-        st.markdown("---")
-
     db = Database()
     db.create_tables()
     db.close()
 
-    # Define pages explicitly with Dashboard as the default first page
+    # Check if user is authenticated in session state
+    if "uid" not in st.session_state or st.session_state.uid is None:
+        render_auth()
+        return
+
+    # --- LOGGED IN EXPERIENCE ---
+    
+    # Define multi-page setup
     dashboard_page = st.Page("pages/1_Dashboard.py", title="Dashboard", icon="📊", default=True)
     transactions_page = st.Page("pages/2_Transactions.py", title="Transactions", icon="💳")
     categories_page = st.Page("pages/3_Categories.py", title="Categories", icon="📁")
@@ -28,14 +31,38 @@ def main():
     goals_page = st.Page("pages/5_Goals.py", title="Goals", icon="🏆")
     reports_page = st.Page("pages/6_Reports.py", title="Reports", icon="📈")
 
-    # Set up navigation structure
-    pg = st.navigation({
-        "Overview": [dashboard_page],
-        "Management": [transactions_page, categories_page, budgets_page, goals_page],
-        "Analytics": [reports_page]
-    })
+    # Sidebar Header
+    with st.sidebar:
+        st.markdown("## 💰 MyExpenditure")
+        if "username" in st.session_state:
+            st.caption(f"Logged in as: **{st.session_state.username}** (UID: {st.session_state.uid})")
+        st.markdown("---")
 
-    # Run the selected page
+    # Navigation menu
+    pg = st.navigation([
+        dashboard_page,
+        transactions_page,
+        categories_page,
+        budgets_page,
+        goals_page,
+        reports_page
+    ])
+
+    # Sidebar Footer & Logout Mechanism
+    with st.sidebar:
+        st.markdown("---")
+        if st.button("🚪 Log Out", use_container_width=True):
+            st.session_state.uid = None
+            st.session_state.username = None
+            st.rerun()
+
+        st.markdown("#### 🗄️ Database Status")
+        st.success("Connected to SQLite Database")
+        st.markdown("---")
+        st.markdown("#### 🎨 Theme Information")
+        st.info("Active Theme: Dark / Shadow & Silk")
+
+    # Run selected page
     pg.run()
 
 if __name__ == "__main__":
