@@ -233,3 +233,58 @@ class Database:
         ))
 
         self.connection.commit()
+
+# ------------------------- Goal functions --------
+
+    def add_goal(self, name, target_amount, deadline):
+        self.cursor.execute("""
+            INSERT INTO goals
+            (name, target_amount, deadline)
+            VALUES (?, ?, ?)
+        """, (name, target_amount, deadline))
+
+        self.connection.commit()
+
+    def get_goals(self):
+        self.cursor.execute("""
+            SELECT *
+            FROM goals
+            ORDER BY deadline
+        """)
+    
+        return self.cursor.fetchall()
+
+
+    def find_goal(self, name):
+        self.cursor.execute("""
+            SELECT *
+            FROM goals
+            WHERE LOWER(name) = LOWER(?)
+        """, (name,))
+
+        return self.cursor.fetchone()
+
+    def update_goal(self, name, target_amount, deadline):
+        self.cursor.execute("""
+            UPDATE goals
+            SET
+                target_amount = ?,
+                deadline = ?
+            WHERE LOWER(name) = LOWER(?)
+        """, (
+            target_amount,
+            deadline,
+            name
+        ))
+
+        self.connection.commit()
+
+
+    def remove_goal(self, name):
+        self.cursor.execute("""
+            DELETE
+            FROM goals
+            WHERE LOWER(name) = LOWER(?)
+        """, (name,))
+
+        self.connection.commit()
