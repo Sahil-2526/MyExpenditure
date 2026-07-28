@@ -169,3 +169,67 @@ class Database:
         """, (date,))
     
         return self.cursor.fetchall()
+
+#------------------------ Budget funcitons ----------
+
+    def add_budget(self, category_id, limit_amount, month, year):
+        self.cursor.execute("""
+            INSERT INTO budgets
+            (category_id, limit_amount, month, year)
+            VALUES (?, ?, ?, ?)
+        """, (category_id, limit_amount, month, year))
+
+        self.connection.commit()
+
+    def get_budgets(self):
+        self.cursor.execute("""
+            SELECT *
+            FROM budgets
+            ORDER BY year DESC, month DESC
+        """)
+
+        return self.cursor.fetchall()
+
+
+    def find_budget(self, category_id, month, year):
+        self.cursor.execute("""
+            SELECT *
+            FROM budgets
+            WHERE category_id = ?
+            AND month = ?
+            AND year = ?
+        """, (category_id, month, year))
+
+        return self.cursor.fetchone()
+
+    def update_budget(self, category_id, limit_amount, month, year):
+        self.cursor.execute("""
+            UPDATE budgets
+            SET limit_amount = ?
+            WHERE category_id = ?
+            AND month = ?
+            AND year = ?
+        """, (
+            limit_amount,
+            category_id,
+            month,
+            year
+        ))
+
+        self.connection.commit()
+
+
+    def remove_budget(self, category_id, month, year):
+        self.cursor.execute("""
+            DELETE
+            FROM budgets
+            WHERE category_id = ?
+            AND month = ?
+            AND year = ?
+        """, (
+            category_id,
+            month,
+            year
+        ))
+
+        self.connection.commit()
