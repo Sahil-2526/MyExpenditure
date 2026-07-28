@@ -144,7 +144,7 @@ class Database:
             WHERE id = ?
         """, (transaction_id,))
 
-    self.connection.commit()
+        self.connection.commit()
 
     def get_transactions_by_month(self, month, year):
         month = f"{month:02d}"
