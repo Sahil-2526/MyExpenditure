@@ -49,6 +49,8 @@ class Database:
                 
         self.connection.commit()
 
+
+#----------------- Category function
     def add_category(self, name, transaction_type, is_default):
         self.cursor.execute("""
             INSERT INTO categories
@@ -83,3 +85,87 @@ class Database:
         """, (name,))
 
         self.connection.commit()
+
+# --------------------- Transaction function 
+
+    def add_transaction(self, amount, date, transaction_type, category_id, note):
+        self.cursor.execute("""
+            INSERT INTO transactions
+            (amount, date, transaction_type, category_id, note)
+            VALUES (?, ?, ?, ?, ?)
+        """, (amount, date, transaction_type, category_id, note))
+
+        self.connection.commit()
+
+    def get_transactions(self):
+        self.cursor.execute("""
+            SELECT *
+            FROM transactions
+            ORDER BY date DESC
+        """)
+
+        return self.cursor.fetchall()
+
+    def find_transaction(self, transaction_id):
+        self.cursor.execute("""
+            SELECT *
+            FROM transactions
+            WHERE id = ?
+        """, (transaction_id,))
+
+        return self.cursor.fetchone()
+
+
+    def update_transaction(self, transaction_id, amount, date, transaction_type, category_id, note ):
+        self.cursor.execute("""
+            UPDATE transactions
+            SET
+                amount = ?,
+                date = ?,
+                transaction_type = ?,
+                category_id = ?,
+                note = ?
+            WHERE id = ?
+        """, (
+            amount,
+            date,
+            transaction_type,
+            category_id,
+            note,
+            transaction_id
+        ))
+
+        self.connection.commit()
+
+    def remove_transaction(self, transaction_id):
+        self.cursor.execute("""
+            DELETE
+            FROM transactions
+            WHERE id = ?
+        """, (transaction_id,))
+
+    self.connection.commit()
+
+    def get_transactions_by_month(self, month, year):
+        month = f"{month:02d}"
+
+        self.cursor.execute("""
+            SELECT *
+            FROM transactions
+            WHERE strftime('%m', date) = ?
+            AND strftime('%Y', date) = ?
+            ORDER BY date
+        """, (month, str(year)))
+
+        return self.cursor.fetchall()
+
+    def get_transactions_by_date(self, day, month, year):
+        date = f"{year:04d}-{month:02d}-{day:02d}"
+
+        self.cursor.execute("""
+            SELECT *
+            FROM transactions
+            WHERE date = ?
+        """, (date,))
+    
+        return self.cursor.fetchall()
