@@ -33,19 +33,56 @@ def render_transactions():
     # DB schema columns: id, uid, amount, date, transaction_type, category_id, note
     df = pd.DataFrame(transactions, columns=['id', 'uid', 'amount', 'date', 'transaction_type', 'category_id', 'note']) if transactions else pd.DataFrame(columns=['id', 'uid', 'amount', 'date', 'transaction_type', 'category_id', 'note'])
 
-    tab1, tab2, tab3 = st.tabs(["View & Filter Transactions", "Add Transaction", "Manage / Delete"])
+    tab1, tab2= st.tabs(["View & Filter Transactions", "Add Transaction"])
 
     with tab1:
-        st.subheader("All Transactions")
-        if not df.empty:
-            df['Category Name'] = df['category_id'].map(cat_map)
-            st.dataframe(df[['id', 'date', 'amount', 'transaction_type', 'Category Name', 'note']], use_container_width=True)
-            
-            c1, c2 = st.columns(2)
-            c1.metric("Total Credits", f"₹{total_credit:,.2f}")
-            c2.metric("Total Debits", f"₹{total_debit:,.2f}")
-        else:
-            st.info("No transactions logged yet.")
+         st.subheader("All Transactions")
+
+    if not df.empty:
+        df["Category Name"] = df["category_id"].map(cat_map)
+
+        # Header
+        #h1, h2, h3, h4, h5, h6, h7 = st.columns([0.8, 1, 1, 1.2, 2, 2.5, 1])
+        h2, h3, h4, h5, h6, h7 = st.columns([1, 1, 1.2, 2, 2.5, 1])
+
+        # h1.markdown("**ID**")
+        h2.markdown("**Date**")
+        h3.markdown("**Amount**")
+        h4.markdown("**Type**")
+        h5.markdown("**Category**")
+        h6.markdown("**Note**")
+        h7.markdown("**Action**")
+
+        st.divider()
+
+        # Display each transaction
+        for _, row in df.iterrows():
+            # c1, c2, c3, c4, c5, c6, c7 = st.columns([0.8, 1, 1, 1.2, 2, 2.5, 1])
+            c2, c3, c4, c5, c6, c7 = st.columns([1, 1, 1.2, 2, 2.5, 1])
+
+            # c1.write(row["id"])
+            c2.write(str(row["date"]))
+            c3.write(f"₹{row['amount']:.2f}")
+            c4.write(row["transaction_type"])
+            c5.write(row["Category Name"])
+            c6.write(row["note"])
+
+            if c7.button("🗑 Delete", key=f"delete_{row['id']}"):
+                try:
+                    manager.db.remove_transaction(row["id"])
+                    st.success(f"Transaction {row['id']} deleted successfully!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error deleting transaction: {e}")
+
+        st.markdown("---")
+
+        col1, col2 = st.columns(2)
+        col1.metric("Total Credits", f"₹{total_credit:,.2f}")
+        col2.metric("Total Debits", f"₹{total_debit:,.2f}")
+
+    else:
+        st.info("No transactions logged yet.")
 
     with tab2:
         st.subheader("Add New Transaction")
@@ -85,19 +122,6 @@ def render_transactions():
                     except Exception as e:
                         st.error(f"Failed to add transaction: {e}")
 
-    with tab3:
-        st.subheader("Delete Transaction")
-        if not df.empty:
-            tx_id_to_delete = st.selectbox("Select Transaction ID to Delete", df['id'].tolist())
-            if st.button("Delete Transaction"):
-                try:
-                    manager.db.remove_transaction(tx_id_to_delete)
-                    st.warning(f"Transaction ID {tx_id_to_delete} deleted!")
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Error deleting transaction: {e}")
-        else:
-            st.info("No transactions available to delete.")
             
     db.close()
 
