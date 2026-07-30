@@ -21,15 +21,15 @@ def render_dashboard():
         budgets = manager.get_all_budgets()
         goals = manager.get_all_goals()
         
-        total_income = sum(t[1] for t in transactions if t[3] == TransactionType.CREDIT.value)
-        total_expense = sum(t[1] for t in transactions if t[3] == TransactionType.DEBIT.value)
+        total_income = sum(t[2] for t in transactions if t[4] == TransactionType.CREDIT.value)
+        total_expense = sum(t[2] for t in transactions if t[4] == TransactionType.DEBIT.value)
         current_balance = total_income - total_expense
         
         cat_spending = {}
         for t in transactions:
-            if t[3] == TransactionType.DEBIT.value:
-                cat_name = cat_map.get(t[4], "Uncategorized")
-                cat_spending[cat_name] = cat_spending.get(cat_name, 0.0) + t[1]
+            if t[4] == TransactionType.DEBIT.value:
+                cat_name = cat_map.get(t[5], "Uncategorized")
+                cat_spending[cat_name] = cat_spending.get(cat_name, 0.0) + t[2]
                 
     except Exception as e:
         st.error(f"Error loading data from backend: {e}")
